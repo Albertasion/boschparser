@@ -16,28 +16,22 @@ require_once('vendor/autoload.php');
 // download_all_products_pages();
 
 $conn = connect_to_db();
-if ($conn->connect_error) {
-    die("Ошибка соединения: " . $conn->connect_error);
-} else {
-    echo "Соединение успешно установлено!";
-}
-
 
 
 //масыви для складання для вигрузки в ексель
 $products_for_export=[];
 $all_images = [];
 $product_description_arr = [];
+$sku_for_export = [];
 
 //перебирает все деталировки из категории products и парсит данные
 $dir_files_pages = 'products';
-    $files_in_directory = scandir($dir_files_pages);
-    foreach ($files_in_directory as $keys=>$files) {
-        if ($files[0]!=='.' && $files[1]!=='.') {
-            // echo $files.'<br>';
-      $doc = file_get_contents($dir_files_pages.'/'.$files);
+$files_in_directory = scandir($dir_files_pages);
+foreach ($files_in_directory as $keys=>$files) {
+if ($files[0]!=='.' && $files[1]!=='.') {
+$doc = file_get_contents($dir_files_pages.'/'.$files);
 $document = \phpQuery::newDocument($doc);
-
+//сырое название 
 $product_name = $document->find('h1');
 $product_name = pq($product_name)->text();
 $product_name_withoutvoltage = preg_replace("/(\S+?) V/", "", $product_name);
@@ -60,25 +54,22 @@ $sku_diagram=trim($sku_diagram);
 $sku_diagram = preg_replace('/[^\p{L}\p{N}]/u', '', $sku_diagram);
 //арткул деталировки чистий
 $sku_diagram = str_replace('EU', '', $sku_diagram);
+$sku_for_export[] = $sku_diagram;
 //проверяем есть ли уже такая модель на сайте
-$sql = "SELECT sp.name_ru FROM sc_products as sp LEFT JOIN sc_categories as sc ON sp.categoryID=sc.categoryID WHERE sc.parts_view = 1 AND sp.name_ru LIKE '%" . $sku_diagram . "%'";
-$result = $conn->query($sql);
-if ($result->num_rows !== 0) {
-    continue;
-} 
+// $sql = "SELECT sp.name_ru FROM sc_products as sp LEFT JOIN sc_categories as sc ON sp.categoryID=sc.categoryID WHERE sc.parts_view = 1 AND sp.name_ru LIKE '%" . $sku_diagram . "%'";
+// $result = $conn->query($sql);
+// if ($result->num_rows !== 0) {
+//     continue;
+// } 
+// else {
+//     $sku_for_export[] = $sku_diagram;
+// }
 
 
 //собираем полную строку для названия
 $product_name_ru = 'Запчасти для ' .'Bosch'. $name_model. ' ' .'('.$sku_diagram.')';
-//проверяем на дубль названия
-if (!in_array($product_name_ru, $products_for_export)) {
+//собираем полные названия
 $products_for_export[] = $product_name_ru;
-echo $product_name_ru.'<br>';
-}
-else {
-    echo $product_name_ru.'<br>'.'Дубль';
-    // continue;
-}
 //картинки
 $images_arr = [];
 $product_image_str = [];
@@ -93,40 +84,47 @@ foreach($images as $key =>$value) {
 $imge_str = implode(';', $images_arr);
 $all_images[] = $imge_str;
 
+
+
+
+
+
+$product_desc = [];
+
+
 // описание
 $table = $document->find('.trrow');
 foreach ($table as $key =>$value){
     //пропускаем первую итерацию. там где заголовки таблицы
     if ($key === 0) {
-        $row_string_product = '<p>Первая строка</p>';
+        $product_desc[$key] = '<p>Первая строка</p>';
     }
     else {
     $_table = pq($value);
     $pos = $_table->find('.poscol')->text();
     $sku = $_table->find('.artcol')->text();
     $sku = str_replace(' ', '', $sku);
-$name_detail = $_table->find('.namecol')->text();
 $row_string_product = '<p>'.$pos. '|'. $sku.'|'.'</p>';
-}
 $product_desc[$key] = $row_string_product;
 }
+}
 $product_description = implode("\n", $product_desc);
-$product_description_arr[$key] = $product_description;
+$product_description_arr[] = $product_description;
         }
     }
     
-
 $conn->close();
 
     $spreadsheet = new Spreadsheet();
     $products_for_export = array_chunk($products_for_export, 1);
     $images_for_export = array_chunk($all_images, 1);
     $description_for_export = array_chunk($product_description_arr, 1);
+    $sku_for_export = array_chunk($sku_for_export, 1);
 
-
-$sheet = $spreadsheet->getActiveSheet()->fromArray($products_for_export, NULL, 'A1');
-$sheet = $spreadsheet->getActiveSheet()->fromArray($images_for_export, NULL, 'B1');
-$sheet = $spreadsheet->getActiveSheet()->fromArray($description_for_export, NULL, 'C1');
+$sheet = $spreadsheet->getActiveSheet()->fromArray($sku_for_export, NULL, 'A1');
+$sheet = $spreadsheet->getActiveSheet()->fromArray($products_for_export, NULL, 'B1');
+$sheet = $spreadsheet->getActiveSheet()->fromArray($images_for_export, NULL, 'C1');
+$sheet = $spreadsheet->getActiveSheet()->fromArray($description_for_export, NULL, 'D1');
 
 $writer = new Xlsx($spreadsheet);
 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
