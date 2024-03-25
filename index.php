@@ -12,8 +12,8 @@ require_once('vendor/autoload.php');
     require_once('functions.php');
 
 
-// pagination_page_create('https://bsc-portal.com.ua/search?searchkeywords=%D0%BF%D0%B5%D1%80%D1%84%D0%BE%D1%80%D0%B0%D1%82%D0%BE%D1%80', 84);
-// download_all_products_pages();
+pagination_page_create('https://bsc-portal.com.ua/search?searchkeywords=%D1%82%D1%80%D0%B8%D0%BC%D0%B5%D1%80', 45);
+download_all_products_pages();
 
 $conn = connect_to_db();
 
@@ -54,16 +54,20 @@ $sku_diagram=trim($sku_diagram);
 $sku_diagram = preg_replace('/[^\p{L}\p{N}]/u', '', $sku_diagram);
 //арткул деталировки чистий
 $sku_diagram = str_replace('EU', '', $sku_diagram);
-$sku_for_export[] = $sku_diagram;
 //проверяем есть ли уже такая модель на сайте
-// $sql = "SELECT sp.name_ru FROM sc_products as sp LEFT JOIN sc_categories as sc ON sp.categoryID=sc.categoryID WHERE sc.parts_view = 1 AND sp.name_ru LIKE '%" . $sku_diagram . "%'";
-// $result = $conn->query($sql);
-// if ($result->num_rows !== 0) {
-//     continue;
-// } 
-// else {
-//     $sku_for_export[] = $sku_diagram;
-// }
+$sql = "SELECT sp.name_ru FROM sc_products as sp LEFT JOIN sc_categories as sc ON sp.categoryID=sc.categoryID WHERE sc.parts_view = 1 AND sp.name_ru LIKE '%" . $sku_diagram . "%'";
+$result = $conn->query($sql);
+if ($result->num_rows !== 0) {
+    continue;
+} 
+else {
+    if(!in_array($sku_diagram, $sku_for_export)) {
+    $sku_for_export[] = $sku_diagram;
+}
+else {
+    continue;
+}
+}
 
 
 //собираем полную строку для названия

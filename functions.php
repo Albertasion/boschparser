@@ -1,5 +1,5 @@
 <?php
-
+namespace Facebook\WebDriver;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
