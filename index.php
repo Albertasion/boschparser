@@ -13,6 +13,6 @@ require_once('vendor/autoload.php');
 
 
 // pagination_page_create('https://bsc-portal.com.ua/search?searchkeywords=%D1%82%D1%80%D0%B8%D0%BC%D0%B5%D1%80', 45);
-download_all_products_pages();
-// parser();
+// download_all_products_pages();
+parser();
 

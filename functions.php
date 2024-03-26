@@ -117,6 +117,7 @@ function silenium_request($url, $name_file) {
         $all_images = [];
         $product_description_arr = [];
         $sku_for_export = [];
+        $products_name_for_export_ru =[];
         
         //перебирает все деталировки из категории products и парсит данные
         $dir_files_pages = 'products';
@@ -156,7 +157,8 @@ function silenium_request($url, $name_file) {
         } 
         else {
             if(!in_array($sku_diagram, $sku_for_export)) {
-            $sku_for_export[] = $sku_diagram;
+            $sku_diagram_str = $sku_diagram.'diagrm';
+            $sku_for_export[] = $sku_diagram_str;
         }
         else {
             continue;
@@ -164,14 +166,16 @@ function silenium_request($url, $name_file) {
         }
         
         
-        //собираем полную строку для названия
+        //собираем полную строку для названия русском
         $product_name_ru = 'Запчасти для ' .'Bosch'. $name_model. ' ' .'('.$sku_diagram.')';
-        //собираем полные названия
-        $products_for_export[] = $product_name_ru;
+        $products_name_for_export_ru[] = $product_name_ru;
+        //собираем полную строку для названия українською
+        $product_name_ua = 'Запчастини для ' .'Bosch'. $name_model. ' ' .'('.$sku_diagram.')';
+        $products_name_for_export_ua[] = $product_name_ua;
+       
         //картинки
         $images_arr = [];
         $product_image_str = [];
-        
         $images = $document->find('.scheme');
         $images = $images->find('img');
         foreach($images as $key =>$value) {
@@ -210,18 +214,34 @@ function silenium_request($url, $name_file) {
         $conn->close();
         
             $spreadsheet = new Spreadsheet();
-            $products_for_export = array_chunk($products_for_export, 1);
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setCellValue('A1', 'Артикул'); 
+            $sheet->setCellValue('B1', 'Название'); 
+            $sheet->setCellValue('C1', 'Название[UA]');
+            $sheet->setCellValue('D1', 'Цена');
+            $sheet->setCellValue('E1', 'Наличие');
+            $sheet->setCellValue('F1', 'Поставщик');
+            $sheet->setCellValue('G1', 'Категория');
+            $sheet->setCellValue('H1', 'Доп. категория');
+            $sheet->setCellValue('I1', 'Описание');
+            $sheet->setCellValue('J1', 'Описание[UA]');
+            $sheet->setCellValue('K1', 'Картинка');
+            $sku_for_export = array_chunk($sku_for_export, 1);
+            $products_name_for_export_ru = array_chunk($products_name_for_export_ru, 1);
+            $products_name_for_export_ua = array_chunk($products_name_for_export_ua, 1);
             $images_for_export = array_chunk($all_images, 1);
             $description_for_export = array_chunk($product_description_arr, 1);
-            $sku_for_export = array_chunk($sku_for_export, 1);
+            
         
-        $sheet = $spreadsheet->getActiveSheet()->fromArray($sku_for_export, NULL, 'A1');
-        $sheet = $spreadsheet->getActiveSheet()->fromArray($products_for_export, NULL, 'B1');
-        $sheet = $spreadsheet->getActiveSheet()->fromArray($images_for_export, NULL, 'C1');
-        $sheet = $spreadsheet->getActiveSheet()->fromArray($description_for_export, NULL, 'D1');
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($sku_for_export, NULL, 'A2');
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($products_name_for_export_ru, NULL, 'B2');
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($products_name_for_export_ua, NULL, 'C2');
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($description_for_export, NULL, 'I2');
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($description_for_export, NULL, 'J2');
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($images_for_export, NULL, 'K2');
         
         $writer = new Xlsx($spreadsheet);
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         
-        $writer->save('export_product.xlsx');
+        $writer->save('export_diagrams.xlsx');
         }
