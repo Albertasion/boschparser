@@ -10,9 +10,30 @@ require_once('vendor/autoload.php');
     ini_set('max_execution_time', 0);
     include_once('phpQuery.php');
     require_once('functions.php');
+    ?>
+    <form action="index.php" method="POST">
+    <input type="text" name='url_diagram' value="Посилання">
+    <input type="text" name='page_qnt' value="Кількість сторінок">
+        <input type="text" name='product_type_ru' value="Название на русс">
+        <input type="text" name='product_type_ua' value="Название на укр">
+        <input type="submit" name='start_parser'>
+     </form>
 
 
-// pagination_page_create('https://bsc-portal.com.ua/search?searchkeywords=%D1%82%D1%80%D0%B8%D0%BC%D0%B5%D1%80', 45);
-// download_all_products_pages();
+
+
+<?php  
+    if (isset($_POST["url_diagram"])) {
+        $url_diagram = $_POST["url_diagram"];
+    }
+    if (isset($_POST["page_qnt"])) {
+        $page_qnt = $_POST["page_qnt"];
+    }
+
+
+if(isset($_POST['start_parser'])) {  
+pagination_page_create($url_diagram, $page_qnt);
+download_all_products_pages();
 parser();
-
+}
+?>

@@ -164,13 +164,18 @@ function silenium_request($url, $name_file) {
             continue;
         }
         }
-        
-        
+        if (isset($_POST["product_type_ru"])) {
+        $product_type_ru = $_POST["product_type_ru"];
+    }
+    if (isset($_POST["product_type_ua"])) {
+        $product_type_ua = $_POST["product_type_ua"];
+    }
+
         //собираем полную строку для названия русском
-        $product_name_ru = 'Запчасти для ' .'Bosch'. $name_model. ' ' .'('.$sku_diagram.')';
+        $product_name_ru = 'Запчасти для '.$product_type_ru.' Bosch'.$name_model. ' ' .'('.$sku_diagram.')';
         $products_name_for_export_ru[] = $product_name_ru;
         //собираем полную строку для названия українською
-        $product_name_ua = 'Запчастини для ' .'Bosch'. $name_model. ' ' .'('.$sku_diagram.')';
+        $product_name_ua = 'Запчастини для '.$product_type_ua.' Bosch'.$name_model. ' ' .'('.$sku_diagram.')';
         $products_name_for_export_ua[] = $product_name_ua;
        
         //картинки
@@ -195,7 +200,7 @@ function silenium_request($url, $name_file) {
         foreach ($table as $key =>$value){
             //пропускаем первую итерацию. там где заголовки таблицы
             if ($key === 0) {
-                $product_desc[$key] = '<p>Первая строка</p>';
+                $product_desc[$key] = '<a class="pim_desc_imgwrp zoomImage dublicate_diagram_image" href="/images_sale/header_chevron-down.svg" data-fancybox="product_pictures_models"><img src="/images_sale/header_chevron-down.svg" data-zoom-image="/images_sale/header_chevron-down.svg"><i class="fa fa-search-plus" aria-hidden="true"></i></a>';
             }
             else {
             $_table = pq($value);
