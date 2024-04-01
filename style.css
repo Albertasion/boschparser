@@ -1,0 +1,22 @@
+form {
+    position: relative;
+  
+  width: 500px;
+    
+    margin: 0 auto;
+  border:1px solid grey;
+    background: #fff ;
+    padding: 10px;
+    border-radius: 15px;
+  }
+  input,
+textarea,
+select,
+button {
+  width: 150px;
+  margin: 5px;
+
+  -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
+  -moz-box-sizing: border-box; /* For legacy (Firefox <29) Gecko based browsers */
+  box-sizing: border-box;
+}

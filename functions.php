@@ -113,11 +113,12 @@ function silenium_request($url, $name_file) {
     function parser (){
         $conn = connect_to_db();
         //масыви для складання для вигрузки в ексель
-        $products_for_export=[];
+        $category_for_export=[];
         $all_images = [];
         $product_description_arr = [];
         $sku_for_export = [];
         $products_name_for_export_ru =[];
+
         
         //перебирает все деталировки из категории products и парсит данные
         $dir_files_pages = 'products';
@@ -126,6 +127,10 @@ function silenium_request($url, $name_file) {
         if ($files[0]!=='.' && $files[1]!=='.') {
         $doc = file_get_contents($dir_files_pages.'/'.$files);
         $document = \phpQuery::newDocument($doc);
+//категория
+    
+
+
         //сырое название 
         $product_name = $document->find('h1');
         $product_name = pq($product_name)->text();
@@ -135,6 +140,7 @@ function silenium_request($url, $name_file) {
         //назва моделі!!
         $name_model = $product_name_explode[0];
         $name_model = preg_replace('/\p{Cyrillic}+/u', '', $name_model);
+        $name_model = trim($name_model);
         //пропускаем пустие модели
         if ($name_model==' - '){
             continue;
@@ -170,12 +176,15 @@ function silenium_request($url, $name_file) {
     if (isset($_POST["product_type_ua"])) {
         $product_type_ua = $_POST["product_type_ua"];
     }
-
+    if (isset($_POST["category"])) {
+        $category = $_POST["category"];
+        $category_for_export[] = $category;
+    }
         //собираем полную строку для названия русском
-        $product_name_ru = 'Запчасти для '.$product_type_ru.' Bosch'.$name_model. ' ' .'('.$sku_diagram.')';
+        $product_name_ru = 'Запчасти для '.$product_type_ru.' Bosch'.' '.$name_model. ' ' .'('.$sku_diagram.')';
         $products_name_for_export_ru[] = $product_name_ru;
         //собираем полную строку для названия українською
-        $product_name_ua = 'Запчастини для '.$product_type_ua.' Bosch'.$name_model. ' ' .'('.$sku_diagram.')';
+        $product_name_ua = 'Запчастини для '.$product_type_ua.' Bosch'.' '.$name_model. ' ' .'('.$sku_diagram.')';
         $products_name_for_export_ua[] = $product_name_ua;
        
         //картинки
@@ -200,7 +209,7 @@ function silenium_request($url, $name_file) {
         foreach ($table as $key =>$value){
             //пропускаем первую итерацию. там где заголовки таблицы
             if ($key === 0) {
-                $product_desc[$key] = '<a class="pim_desc_imgwrp zoomImage dublicate_diagram_image" href="/images_sale/header_chevron-down.svg" data-fancybox="product_pictures_models"><img src="/images_sale/header_chevron-down.svg" data-zoom-image="/images_sale/header_chevron-down.svg"><i class="fa fa-search-plus" aria-hidden="true"></i></a>';
+                $product_desc[$key] = '<p>Список</p>';
             }
             else {
             $_table = pq($value);
@@ -236,11 +245,12 @@ function silenium_request($url, $name_file) {
             $products_name_for_export_ua = array_chunk($products_name_for_export_ua, 1);
             $images_for_export = array_chunk($all_images, 1);
             $description_for_export = array_chunk($product_description_arr, 1);
-            
+            $category_for_export = array_chunk($category_for_export, 1);
         
         $sheet = $spreadsheet->getActiveSheet()->fromArray($sku_for_export, NULL, 'A2');
         $sheet = $spreadsheet->getActiveSheet()->fromArray($products_name_for_export_ru, NULL, 'B2');
         $sheet = $spreadsheet->getActiveSheet()->fromArray($products_name_for_export_ua, NULL, 'C2');
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($category_for_export, NULL, 'G2');
         $sheet = $spreadsheet->getActiveSheet()->fromArray($description_for_export, NULL, 'I2');
         $sheet = $spreadsheet->getActiveSheet()->fromArray($description_for_export, NULL, 'J2');
         $sheet = $spreadsheet->getActiveSheet()->fromArray($images_for_export, NULL, 'K2');

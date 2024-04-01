@@ -11,12 +11,21 @@ require_once('vendor/autoload.php');
     include_once('phpQuery.php');
     require_once('functions.php');
     ?>
+   <link rel="stylesheet" type="text/css" href="style.css"/>
+    <h1>Парсер деталювань Bosch</h1>
+    <p>https://bsc-portal.com.ua/</p>
     <form action="index.php" method="POST">
-    <input type="text" name='url_diagram' value="Посилання">
-    <input type="text" name='page_qnt' value="Кількість сторінок">
-        <input type="text" name='product_type_ru' value="Название на русс">
-        <input type="text" name='product_type_ua' value="Название на укр">
-        <input type="submit" name='start_parser'>
+    <label for="url_diagram">Вкажіть посиланння на деталювання:</label>
+    <input type="text" name='url_diagram' id="url_diagram"></br>
+    <label for="page_qnt">Кількість сторінок пагінації:</label>
+    <input type="text" name='page_qnt' id="page_qnt"></br>
+    <label for="product_type_ru">Назва на рус:</label>
+        <input type="text" name='product_type_ru' id="product_type_ru"></br>
+        <label for="product_type_ua">Назва на укр:</label>
+        <input type="text" name='product_type_ua' id="product_type_ua"></br>
+        <label for="category">Категория</label>
+        <input type="text" name='category' id="category"></br>
+        <input type="submit" name='start_parser'></br>
      </form>
 
 
@@ -29,6 +38,7 @@ require_once('vendor/autoload.php');
     if (isset($_POST["page_qnt"])) {
         $page_qnt = $_POST["page_qnt"];
     }
+
 
 
 if(isset($_POST['start_parser'])) {  
