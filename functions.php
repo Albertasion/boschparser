@@ -24,6 +24,36 @@ function format ($expre) {
 }
 
 
+function delete_all_files(){
+$dir_downloads = 'downloads';
+$files_downloads = scandir($dir_downloads);
+foreach($files_downloads as $file){
+    if ($file != '.' && $file != '..') {
+        
+        unlink($dir_downloads . '/' . $file);
+        echo 'Удалено' . $file;
+    }
+}
+
+
+
+$dir_products = 'products';
+$files_products = scandir($dir_products);
+foreach($files_products as $file){
+    if ($file != '.' && $file != '..') {
+        
+        unlink($dir_products . '/' . $file);
+        echo 'Удалено' . $file;
+    }
+}
+
+
+}
+
+
+
+
+
 //завантаження всіх сторінок пагінаційю
 //обхід і загрузка всіх сторінок с пагінацією
 function pagination_page_create($url, $page_qnt) {
