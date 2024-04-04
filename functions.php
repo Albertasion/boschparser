@@ -158,8 +158,8 @@ function silenium_request($url, $name_file) {
         $doc = file_get_contents($dir_files_pages.'/'.$files);
         $document = \phpQuery::newDocument($doc);
 //категория
-    
-
+   
+  
 
         //сырое название 
         $product_name = $document->find('h1');
@@ -235,21 +235,28 @@ function silenium_request($url, $name_file) {
         
         
         // описание
-        $table = $document->find('.trrow');
-        foreach ($table as $key =>$value){
-            //пропускаем первую итерацию. там где заголовки таблицы
+        $table = $document->find('.prodMobile');
+        foreach ($table as $key=> $divElement) {
             if ($key === 0) {
                 $product_desc[$key] = '<p>Список</p>';
             }
             else {
-            $_table = pq($value);
-            $pos = $_table->find('.poscol')->text();
-            $sku = $_table->find('.artcol')->text();
-            $sku = str_replace(' ', '', $sku);
-        $row_string_product = '<p>'.$pos. '|'. $sku.'|'.'</p>';
-        $product_desc[$key] = $row_string_product;
+            $div = pq($divElement);
+            $row = $div->find('.row');
+           $pos =  $row->eq(2);
+           $pos = $pos->find('.colValue');
+           $pos = $pos->text();
+            
+$sku = $row->eq(3);
+$sku = $sku->find('.colValue');
+$sku = $sku->text();
+$sku = str_replace(' ', '', $sku);
+$row_string_product = '<p>'.$pos. '|'. $sku.'|'.'</p>';
+$product_desc[$key] = $row_string_product;
+echo $row_string_product.'<br>';
         }
-        }
+    }
+    
         $product_description = implode("\n", $product_desc);
         $product_description_arr[] = $product_description;
                 }
