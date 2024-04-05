@@ -43,8 +43,8 @@ require_once('vendor/autoload.php');
 
 if(isset($_POST['start_parser'])) { 
 delete_all_files(); 
-// pagination_page_create($url_diagram, $page_qnt);
-// download_all_products_pages();
-// parser();
+pagination_page_create($url_diagram, $page_qnt);
+download_all_products_pages();
+parser();
 }
 ?>
